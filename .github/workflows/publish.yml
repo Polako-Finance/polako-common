@@ -27,7 +27,7 @@ jobs:
 
       - name: Configure Poetry
         run: |
-          poetry config repositories.github https://github.com/Polako-Finance/polako-common
+          poetry config repositories.github https://ghcr.io/polako-finance
           poetry config http-basic.github ${{ github.actor }} ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build package
