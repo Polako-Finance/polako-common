@@ -1,7 +1,7 @@
 """Messaging infrastructure for RabbitMQ with Avro serialization and simple JSON messaging"""
 
-from contract_validator import ContractValidator
-from rabbitmq_client import RabbitMQClient
+from polako_common.messaging.contract_validator import ContractValidator
+from polako_common.messaging.rabbitmq_client import RabbitMQClient
 
 __all__ = [
     "ContractValidator",
