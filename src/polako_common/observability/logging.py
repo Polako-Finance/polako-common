@@ -52,6 +52,7 @@ def setup_logging(
     service_name: str,
     log_level: str = "INFO",
     json_format: bool = False,
+    enable_console_logs: bool = True,
     correlation_id: Optional[str] = None,
 ) -> None:
     """
@@ -61,6 +62,7 @@ def setup_logging(
         service_name: Name of the service for log identification
         log_level: Minimum log level to output
         json_format: Whether to output logs in JSON format
+        enable_console_logs: Whether to enable console/stdout logging alongside JSON
         correlation_id: Optional correlation ID to include in all logs
     """
     # Remove default handler
@@ -118,12 +120,22 @@ def setup_logging(
             format="{message}",
             serialize=serialize,
         )
+
+        # Add console logging alongside JSON if enabled
+        if enable_console_logs:
+            logger.add(
+                sys.stdout,  # Use stdout for console logs so they're visible in kubectl logs
+                level=log_level.upper(),
+                format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
+                colorize=True,
+            )
     else:
         # For development: colorful console output
         logger.add(
             sys.stdout,
             level=log_level.upper(),
-            format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message} | {extra}",
+            format="<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> | <level>{message}</level>",
+            colorize=True,
         )
 
     # Intercept standard logging

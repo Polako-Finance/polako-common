@@ -69,7 +69,6 @@ def setup_telemetry(
     trace.set_tracer_provider(tracer_provider)
 
     logger.info("OpenTelemetry tracer configured successfully")
-    return tracer_provider
 
 
 def instrument_fastapi(app):
@@ -79,29 +78,43 @@ def instrument_fastapi(app):
     Args:
         app: The FastAPI application to instrument
     """
-    FastAPIInstrumentor.instrument_app(app)
-    logger.debug("FastAPI instrumented for tracing")
+    try:
+        FastAPIInstrumentor.instrument_app(app)
+        logger.debug("FastAPI instrumented for tracing")
+    except Exception as e:
+        logger.error(f"Failed to instrument FastAPI: {e}")
 
 
 def instrument_sqlalchemy():
     """
     Instrument SQLAlchemy for tracing.
     """
-    SQLAlchemyInstrumentor.instrument()
-    logger.debug("SQLAlchemy instrumented for tracing")
+    try:
+        # Check if already instrumented
+        if not getattr(SQLAlchemyInstrumentor, "_is_instrumented", False):
+            SQLAlchemyInstrumentor().instrument()
+            SQLAlchemyInstrumentor._is_instrumented = True
+        logger.debug("SQLAlchemy instrumented for tracing")
+    except Exception as e:
+        logger.error(f"Failed to instrument SQLAlchemy: {e}")
 
 
 def instrument_aiohttp():
     """
     Instrument aiohttp client for tracing.
     """
-    AioHttpClientInstrumentor.instrument()
-    logger.debug("AioHTTP client instrumented for tracing")
+    try:
+        # Check if already instrumented
+        if not getattr(AioHttpClientInstrumentor, "_is_instrumented", False):
+            AioHttpClientInstrumentor().instrument()
+            AioHttpClientInstrumentor._is_instrumented = True
+        logger.debug("AioHTTP client instrumented for tracing")
+    except Exception as e:
+        logger.error(f"Failed to instrument aiohttp: {e}")
 
 
 def get_trace_context() -> Dict[str, str]:
     """
-    Get the current trace context as a dictionary.
 
     Returns:
         Dictionary with trace_id and span_id if available, empty dict otherwise
